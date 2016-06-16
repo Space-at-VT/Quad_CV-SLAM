@@ -62,14 +62,14 @@ while frameIdx < frameIdxMaximum:
             # Find initial region of interest, calc bounding box
             if frameIdx == mFrame1Idx:
                 success, frame = vid.file.read()
-                mFrame1 = frame.copy()
+                mFrame1 = np.copy(frame)
                 if not(success):
                     vid.close_out()
                     break
                 frameIdx += 1
             elif frameIdx == mFrame2Idx:
                 success, frame = vid.file.read()
-                mFrame2 = frame.copy()
+                mFrame2 = np.copy(frame)
                 if not(success):
                     vid.close_out()
                     break
@@ -84,7 +84,7 @@ while frameIdx < frameIdxMaximum:
                 kp0 = np.array(kp0)
                 cloud = PointCloud(kp0,des0,roiVec)
                 # initialize parameters for point propagation
-                oldFrame = mFrame1.copy()
+                oldFrame = np.copy(mFrame1)
                 oldFrame = cvtools.GrayBlur(oldFrame,5,5,3)
                 mask = np.zeros_like(oldFrame)
                 # initialize KLT tracker
@@ -106,11 +106,11 @@ while frameIdx < frameIdxMaximum:
                 
         elif "cloud" in locals():
             # loop thru frames to estimate pixel motion
-            loopDummy = frameIdx.copy()
+            loopDummy = np.copy(frameIdx)
             for jj in range(loopDummy,loopDummy + 30):
                 # get new frame
                 success, frame = vid.file.read()
-                newFrameColor = frame.copy()
+                newFrameColor = np.copy(frame)
                 if not(success):
                     break
                 newFrame = cvtools.GrayBlur(newFrameColor,5,5,3)
@@ -120,7 +120,7 @@ while frameIdx < frameIdxMaximum:
                 else:
                     trackMode = "track"
                 p0,p1 = cvtools.TrackMatch(cloud,oldFrame,newFrame,lkParams,orb,bf,trackMode)
-                oldFrame = newFrame.copy()
+                oldFrame = np.copy(newFrame)
                 # calculate the average motion
                 if frameIdx == loopDummy:
                     frameAvg = np.zeros([30,1],dtype = np.float16)
@@ -153,7 +153,7 @@ while frameIdx < frameIdxMaximum:
     elif mode == "init":
         # get new frame, continue point tracking
         success, frame = vid.file.read()
-        newFrameColor = frame.copy()
+        newFrameColor = np.copy(frame)
         if not(success):
             break
         newFrame = cvtools.GrayBlur(newFrameColor,5,5,3)
@@ -163,7 +163,7 @@ while frameIdx < frameIdxMaximum:
         else:
             trackMode = "track"
         p0,p1 = cvtools.TrackMatch(cloud,oldFrame,newFrame,lkParams,orb,bf,trackMode)
-        oldFrame = newFrame.copy()
+        oldFrame = np.copy(newFrame)
         
         cv2.imshow(vid.title,frame)
         k = cv2.waitKey(31) & 0xff

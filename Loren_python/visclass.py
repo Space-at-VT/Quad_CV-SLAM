@@ -25,11 +25,11 @@ class VidFile:
     def __init__(self,vidFilePath,vidTitle):
         self.file = cv2.VideoCapture(vidFilePath)
         self.title = vidTitle
-        self.fps = self.file.get(cv2.cv.CV_CAP_PROP_FPS)
-        self.size = (int(self.file.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)),
-                     int(self.file.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)))
-        self.width = int(self.file.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
-        self.height = int(self.file.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
+        self.fps = self.file.get(cv2.CAP_PROP_FPS)
+        self.size = (int(self.file.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                     int(self.file.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        self.width = int(self.file.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.height = int(self.file.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.lenDiag = np.sqrt(np.power(self.width,2) + np.power(self.height,2))
         self.lenDiag = np.int16(self.lenDiag)
         self.K = np.array([[self.width,0,self.width/2],

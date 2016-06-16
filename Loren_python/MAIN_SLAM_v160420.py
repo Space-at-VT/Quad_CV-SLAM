@@ -26,12 +26,12 @@ showROIBox = False # doesn't work yet!
 drawKLT = True
 
 # Select Video File
-#videoFilepath = "Videos\data050.avi"
-#videoFilepath = "Videos\data051.avi"
-#videoFilepath = "Videos\data060.avi"
-#videoFilepath = "Videos\ShuttleOrbit.wmv"
-#videoFilepath = "Videos\Vehicle2.wmv"
-videoFilepath = "Videos\TAMUHomer.mp4"
+#videoFilepath = "..\Videos\data050.avi"
+#videoFilepath = "..\Videos\data051.avi"
+#videoFilepath = "..\Videos\data060.avi"
+#videoFilepath = "..\Videos\ShuttleOrbit.wmv"
+#videoFilepath = "..\Videos\Vehicle2.wmv"
+videoFilepath = "..\Videos\TAMUHomer.mp4"
 vidTitle = videoFilepath.rsplit('\\')[1]
 
 # Create primary instance of VidFile

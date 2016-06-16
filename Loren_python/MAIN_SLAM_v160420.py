@@ -25,6 +25,9 @@ previewVideo = False
 showROIBox = False # doesn't work yet!
 drawKLT = True
 
+################# BUG FIX #######################
+cv2.ocl.setUseOpenCL(False)
+
 # Select Video File
 #videoFilepath = "..\Videos\data050.avi"
 #videoFilepath = "..\Videos\data051.avi"
@@ -49,7 +52,7 @@ while success and cv2.waitKey(31) == -1 and previewVideo:
 # --- MAIN LOOP ---
 mode = "preinit"
 firstFrame = np.int32(500)
-vid.file.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, firstFrame)
+vid.file.set(cv2.CAP_PROP_POS_FRAMES, firstFrame)
 frameIdx = firstFrame
 frameIdxMaximum = 800
 rFrames = 5

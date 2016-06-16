@@ -26,6 +26,8 @@ showROIBox = False # doesn't work yet!
 drawKLT = True
 
 ################# BUG FIX #######################
+# Only need this for OpenCV 3.0>
+# See https://github.com/Itseez/opencv/issues/6081 for updates
 cv2.ocl.setUseOpenCL(False)
 
 # Select Video File
@@ -51,7 +53,7 @@ while success and cv2.waitKey(31) == -1 and previewVideo:
         
 # --- MAIN LOOP ---
 mode = "preinit"
-firstFrame = np.int32(500)
+firstFrame = np.int32(100)
 vid.file.set(cv2.CAP_PROP_POS_FRAMES, firstFrame)
 frameIdx = firstFrame
 frameIdxMaximum = 800

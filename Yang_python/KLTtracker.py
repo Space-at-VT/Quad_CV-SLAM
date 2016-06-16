@@ -135,7 +135,7 @@ class KLTtracker():
                 temp.append(des1[i])
         self.des0 = temp
         
-        self.p0 = np.array(p1.copy())
+        self.p0 = np.copy(np.array(p1))
 
         self.oldFrame = frame_gray
 

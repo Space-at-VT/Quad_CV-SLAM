@@ -17,7 +17,7 @@ import modes
 #custom classes
 from convexHull import ConvexHull
 from KLTtracker import KLTtracker
-from pointCloud import PointCloud
+# from pointCloud import PointCloud
 from reconstructor import PointReconstructor
 
 #parameters
@@ -32,7 +32,7 @@ MatchUpdateFrames = 5
 mode = modes.PRE_INIT
 
 #videoInput
-cap = cv2.VideoCapture("data051.avi")
+cap = cv2.VideoCapture("../Videos/data051.avi")
 
 #object initialization
 convexHull = ConvexHull()

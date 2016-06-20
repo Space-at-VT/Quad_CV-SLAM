@@ -9,6 +9,7 @@ Created on Wed Jun 1 2016
 #module
 import numpy as np
 import cv2
+import math
 
 #constants
 import modes
@@ -32,7 +33,11 @@ MatchUpdateFrames = 5
 mode = modes.PRE_INIT
 
 #videoInput
-cap = cv2.VideoCapture("data051.avi")
+cap = cv2.VideoCapture("data050.avi")
+width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+diagLength = math.sqrt(width**2+height**2)
+
 
 #object initialization
 convexHull = ConvexHull()
@@ -42,6 +47,9 @@ tracker = None
 rect = None
 p0 = None
 p1 = None
+
+#threshold
+distThresh = 0.3
 
 cv2.ocl.setUseOpenCL(False)
 
@@ -57,16 +65,7 @@ while(cap.isOpened()):
     #updates ROI every certain number of frames
     if(counter%ROIUpdateFrames==0 and counter!=0):
         hull,rect = convexHull.boundingRect(frame)
-
-    if(mode!=modes.PRE_INIT):
-        img = frame[rect[1]:rect[1]+rect[3],rect[0]:rect[0]+rect[2]]
-
-        #refreshes points being tracked every certain number of frames
-        if(counter%MatchUpdateFrames==0 and counter!=0):
-            p0,p1 = tracker.match(frame,orb,bf)
-        else:
-            p0,p1 = tracker.track(frame)
-        kp, des = orb.detectAndCompute(img, None)
+        
     
     if(mode==modes.PRE_INIT):
         #gets ROI
@@ -77,9 +76,35 @@ while(cap.isOpened()):
         if(counter==1):
             mode = modes.INIT
             tracker = KLTtracker(frame,kp,des,rect)
+            
 
     elif(mode==modes.INIT):
-        pass
+        des0 = des
+        img = frame[rect[1]:rect[1]+rect[3],rect[0]:rect[0]+rect[2]]
+
+        #refreshes points being tracked every certain number of frames
+        if(counter%MatchUpdateFrames==0 and counter!=0):
+            p0,p1 = tracker.match(frame,orb,bf)
+        else:
+            p0,p1 = tracker.track(frame)
+        kp, des = orb.detectAndCompute(img, None)
+        
+        average = 0
+        for i in range(len(p0)):
+            average+=math.sqrt((p0[i][0]-p1[i][0])**2+(p0[i][1]-p1[i][1])**2)
+        average/=p0.size
+        percentDist = (average/diagLength)*100
+        
+        if(percentDist>distThresh):
+            F = cv2.findFundamentalMat(p0, p1)[0]
+            print(F)
+            #mode = modes.PNP
+    elif(mode==modes.PNP):
+        if(counter%MatchUpdateFrames==0 and counter!=0):
+            p0,p1 = tracker.match(frame,orb,bf)
+        else:
+            p0,p1 = tracker.track(frame)
+        kp, des = orb.detectAndCompute(img, None)
 
     #draws point tracks
     if(showTracks):

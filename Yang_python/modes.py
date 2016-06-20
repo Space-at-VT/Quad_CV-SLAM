@@ -1,6 +1,3 @@
 PRE_INIT = 0
 INIT = 1
-CLOUD = 2
-PNP = 3
-MATCH = 4
-TRACK = 5
+PNP = 2

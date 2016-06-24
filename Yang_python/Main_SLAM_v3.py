@@ -10,6 +10,7 @@ Created on Wed Jun 1 2016
 import numpy as np
 import cv2
 import math
+import cvtools
 
 #constants
 import modes
@@ -47,6 +48,8 @@ tracker = None
 rect = None
 p0 = None
 p1 = None
+
+K = np.matrix([[width,0,width/2],[0,width,height/2],[0,0,1]])
 
 #threshold
 distThresh = 0.3
@@ -96,8 +99,10 @@ while(cap.isOpened()):
         percentDist = (average/diagLength)*100
         
         if(percentDist>distThresh):
-            F = cv2.findFundamentalMat(p0, p1)[0]
-            print(F)
+            F = cv2.findFundamentalMat(p0, p1,cv2.FM_8POINT)[0]
+            E = K.transpose()*F*K
+            U,S,V = np.linalg.svd(K)
+            possible = cvtools.getProjectionMatrices(U,S,V)
             #mode = modes.PNP
     elif(mode==modes.PNP):
         if(counter%MatchUpdateFrames==0 and counter!=0):

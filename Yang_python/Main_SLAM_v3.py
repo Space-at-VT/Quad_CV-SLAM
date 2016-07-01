@@ -19,7 +19,7 @@ import modes
 #custom classes
 from convexHull import ConvexHull
 from KLTtracker import KLTtracker
-# from pointCloud import PointCloud
+from pointCloud import PointCloud
 from reconstructor import PointReconstructor
 
 #parameters
@@ -34,15 +34,10 @@ MatchUpdateFrames = 5
 mode = modes.PRE_INIT
 
 #videoInput
-<<<<<<< HEAD:Yang_python/Main_SLAM_v3.py
-cap = cv2.VideoCapture("../Videos/data051.avi")
-=======
 cap = cv2.VideoCapture("data050.avi")
 width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 diagLength = math.sqrt(width**2+height**2)
-
->>>>>>> yangf-dev:Yang_python/Main_SLAM_v3.py
 
 #object initialization
 convexHull = ConvexHull()

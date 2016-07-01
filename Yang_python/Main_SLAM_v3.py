@@ -103,6 +103,7 @@ while(cap.isOpened()):
             E = K.transpose()*F*K
             U,S,V = np.linalg.svd(K)
             possible = cvtools.getProjectionMatrices(U,S,V)
+            P = cvtools.getCorrectProjectionMatrix(possible, K, p0, p1)
             #mode = modes.PNP
     elif(mode==modes.PNP):
         if(counter%MatchUpdateFrames==0 and counter!=0):

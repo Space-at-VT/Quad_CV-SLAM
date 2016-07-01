@@ -113,13 +113,13 @@ class KLTtracker():
         for i in range(len(st)):
             if(st[i,0]==1):
                 temp.append(p0[i])
-        p0 = temp
+        p0 = np.array(temp)
         
         temp = []
         for i in range(len(st)):
             if(st[i,0]==1):
                 temp.append(p1[i])
-        p1 = temp
+        p1 = np.array(temp)
         
         self.increment_life(st)
 

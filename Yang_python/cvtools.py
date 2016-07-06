@@ -101,6 +101,8 @@ def getCorrectProjectionMatrix(PXcam, K, p0, p1):
         P = PXcam[:,:,2]
     elif(depth[3,0]>0 and depth[3,1]>0):
         P = PXcam[:,:,3]
+        
+    return P
     
 #filters out track noise, not complete yet
 def filterTracks(p0, p1):

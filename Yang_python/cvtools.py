@@ -92,6 +92,15 @@ def getCorrectProjectionMatrix(PXcam, K, p0, p1):
         T = X3D[-1,i]
         m3n = np.sqrt(np.inner(Pcam[2,0:3],Pcam[2,0:3]))
         depth[i,1] = (np.sign(np.linalg.det(Pcam[:,0:3]))*w)/(T*m3n)
+
+    if(depth[0,0]>0 and depth[0,1]>0):
+        P = PXcam[:,:,0]
+    elif(depth[1,0]>0 and depth[1,1]>0):
+        P = PXcam[:,:,1]
+    elif(depth[2,0]>0 and depth[2,1]>0):
+        P = PXcam[:,:,2]
+    elif(depth[3,0]>0 and depth[3,1]>0):
+        P = PXcam[:,:,3]
     
 #filters out track noise, not complete yet
 def filterTracks(p0, p1):

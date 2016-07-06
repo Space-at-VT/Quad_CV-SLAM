@@ -86,11 +86,11 @@ def getCorrectProjectionMatrix(PXcam, K, p0, p1):
         Uan,San,Van = np.linalg.svd(Anorm)
 
         X3D[:,i] = Van[:,-1].reshape(4)
-        xi = PXcam[:,:,i]*X3D[:,i]
+
+        xi = np.dot(PXcam[:,:,i],X3D[:,i])
         w = xi[2]
         T = X3D[-1,i]
         m3n = np.sqrt(np.inner(Pcam[2,0:3],Pcam[2,0:3]))
-        print(w)
         depth[i,1] = (np.sign(np.linalg.det(Pcam[:,0:3]))*w)/(T*m3n)
     
 #filters out track noise, not complete yet

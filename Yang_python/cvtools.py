@@ -73,22 +73,25 @@ def getCorrectProjectionMatrix(PXcam, K, p0, p1):
         #A3n = math.sqrt(sum(A[0,:].*A[0,:]))
         #A4n = math.sqrt(sum(A[0,:].*A[0,:]))
 
-        print(A[0,:])
-        print(A[1,:])
-        
         A1n = np.sqrt(np.inner(A[0,:],A[0,:]))
         A2n = np.sqrt(np.inner(A[1,:],A[1,:]))
         A3n = np.sqrt(np.inner(A[2,:],A[2,:]))
         A4n = np.sqrt(np.inner(A[3,:],A[3,:]))
 
-        Anorm = [A[0,:]/A1n,
+        Anorm = np.vstack((A[0,:]/A1n,
                 A[1,:]/A2n,
                 A[2,:]/A3n,
-                A[3,:]/A4n]
+                A[3,:]/A4n))
 
         Uan,San,Van = np.linalg.svd(Anorm)
-        
-        #X3D[:,i] = Van[:,-1]
+
+        X3D[:,i] = Van[:,-1].reshape(4)
+        xi = PXcam[:,:,i]*X3D[:,i]
+        w = xi[2]
+        T = X3D[-1,i]
+        m3n = np.sqrt(np.inner(Pcam[2,0:3],Pcam[2,0:3]))
+        print(w)
+        depth[i,1] = (np.sign(np.linalg.det(Pcam[:,0:3]))*w)/(T*m3n)
     
 #filters out track noise, not complete yet
 def filterTracks(p0, p1):

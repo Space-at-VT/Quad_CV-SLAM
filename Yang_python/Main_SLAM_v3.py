@@ -6,10 +6,16 @@ Created on Wed Jun 1 2016
 #!python3
 
 
+####TODO
+# 2D3D correspondence
+# Index points
+
 #module
 import numpy as np
 import cv2
 import math
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import cvtools
 
 #constants
@@ -48,6 +54,7 @@ tracker = None
 rect = None
 p0 = None
 p1 = None
+pointCloud = None
 
 K = np.matrix([[width,0,width/2],[0,width,height/2],[0,0,1]])
 
@@ -82,9 +89,8 @@ while(cap.isOpened()):
             
 
     elif(mode==modes.INIT):
-        des0 = des
         img = frame[rect[1]:rect[1]+rect[3],rect[0]:rect[0]+rect[2]]
-
+        
         #refreshes points being tracked every certain number of frames
         if(counter%MatchUpdateFrames==0 and counter!=0):
             p0,p1 = tracker.match(frame,orb,bf)
@@ -99,19 +105,24 @@ while(cap.isOpened()):
         percentDist = (average/diagLength)*100
         
         if(percentDist>distThresh):
+            P1 = K*np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0]])
             F = cv2.findFundamentalMat(p0, p1,cv2.FM_8POINT)[0]
             E = K.transpose()*F*K
             U,S,V = np.linalg.svd(K)
             possible = cvtools.getProjectionMatrices(U,S,V)
-            P = cvtools.getCorrectProjectionMatrix(possible, K, p0, p1)
-            #mode = modes.PNP
+            P2 = cvtools.getCorrectProjectionMatrix(possible, K, p0, p1)
+            P2 = K*P2
+            pointCloud = cv2.triangulatePoints(P1,P2,p0.transpose(),p1.transpose())
+            mode = modes.PNP
+            
     elif(mode==modes.PNP):
+        img = frame[rect[1]:rect[1]+rect[3],rect[0]:rect[0]+rect[2]]
         if(counter%MatchUpdateFrames==0 and counter!=0):
             p0,p1 = tracker.match(frame,orb,bf)
         else:
             p0,p1 = tracker.track(frame)
         kp, des = orb.detectAndCompute(img, None)
-
+        
     #draws point tracks
     if(showTracks):
         if(p0!=None and p1!=None):
@@ -135,5 +146,6 @@ while(cap.isOpened()):
         break
 
     counter+=1
+
 cap.release()
 cv2.destroyAllWindows()

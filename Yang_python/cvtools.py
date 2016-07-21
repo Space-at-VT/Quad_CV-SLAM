@@ -17,6 +17,9 @@ def GrayBlur(frame,k1=5,k2=5,sig=0):
     
     return frame
 
+def find2D3Dcorrespondence(pointCloud, visiblePoints):
+    pass
+
 def getProjectionMatrices(U,S,V):
     W = np.array([[0,-1,0],[1,0,0],[0,0,1]])
     PXcam = np.zeros((3,4,4))

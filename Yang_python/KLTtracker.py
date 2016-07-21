@@ -82,7 +82,7 @@ class KLTtracker():
         # adjust point coordinates from hull frame to image frame
         for ii in range(0,kp1.size):
             kp1[ii].pt = (kp1[ii].pt[0]+self.x,kp1[ii].pt[1]+self.y)
-            
+        
         self.p0 = np.zeros([kp1.size,2],dtype = np.float32)
         for ii in range(0,kp1.size):
             self.p0[ii,:] = (kp1[ii].pt[0],kp1[ii].pt[1])

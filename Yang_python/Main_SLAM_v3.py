@@ -14,8 +14,6 @@ Created on Wed Jun 1 2016
 import numpy as np
 import cv2
 import math
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import cvtools
 
 #constants
@@ -55,6 +53,9 @@ rect = None
 p0 = None
 p1 = None
 pointCloud = None
+
+map2D3D = []
+map3D2D = []
 
 K = np.matrix([[width,0,width/2],[0,width,height/2],[0,0,1]])
 
@@ -108,19 +109,26 @@ while(cap.isOpened()):
             P1 = K*np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0]])
             F = cv2.findFundamentalMat(p0, p1,cv2.FM_8POINT)[0]
             E = K.transpose()*F*K
-            U,S,V = np.linalg.svd(K)
+            U,S,V = np.linalg.svd(E)
             possible = cvtools.getProjectionMatrices(U,S,V)
             P2 = cvtools.getCorrectProjectionMatrix(possible, K, p0, p1)
             P2 = K*P2
+            print(P1)
+            print(P2)
+            
             pointCloud = cv2.triangulatePoints(P1,P2,p0.transpose(),p1.transpose())
             mode = modes.PNP
+
+            map2D3D = list(range(pointCloud.shape[1]))
+            map3D2D = list(range(pointCloud.shape[1]))
             
     elif(mode==modes.PNP):
         img = frame[rect[1]:rect[1]+rect[3],rect[0]:rect[0]+rect[2]]
         if(counter%MatchUpdateFrames==0 and counter!=0):
             p0,p1 = tracker.match(frame,orb,bf)
         else:
-            p0,p1 = tracker.track(frame)
+            p0,p1 = tracker.track(frame, True, map2D3D, map3D2D)
+
         kp, des = orb.detectAndCompute(img, None)
         
     #draws point tracks
@@ -147,5 +155,8 @@ while(cap.isOpened()):
 
     counter+=1
 
+
 cap.release()
 cv2.destroyAllWindows()
+
+cvtools.plotPointCloud(pointCloud)

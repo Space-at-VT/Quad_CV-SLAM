@@ -10,15 +10,13 @@ Created on Thu Mar 24 18:06:54 2016
 import cv2
 import numpy as np
 import math
-
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 def GrayBlur(frame,k1=5,k2=5,sig=0):
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     frame = cv2.GaussianBlur(frame,(k1,k2),sig)
     
     return frame
-
-def find2D3Dcorrespondence(pointCloud, visiblePoints):
-    pass
 
 def getProjectionMatrices(U,S,V):
     W = np.array([[0,-1,0],[1,0,0],[0,0,1]])
@@ -93,9 +91,16 @@ def getCorrectProjectionMatrix(PXcam, K, p0, p1):
         xi = np.dot(PXcam[:,:,i],X3D[:,i])
         w = xi[2]
         T = X3D[-1,i]
+        m3n = np.sqrt(np.inner(PXcam[2,0:3,i],PXcam[2,0:3,i]))
+        depth[i,0] = (np.sign(np.linalg.det(PXcam[:,0:3,i]))*w)/(T*m3n)
+
+        xi = np.dot(Pcam[:,:],X3D[:,i])
+        w = xi[2]
+        T = X3D[-1,i]
         m3n = np.sqrt(np.inner(Pcam[2,0:3],Pcam[2,0:3]))
         depth[i,1] = (np.sign(np.linalg.det(Pcam[:,0:3]))*w)/(T*m3n)
 
+        
     if(depth[0,0]>0 and depth[0,1]>0):
         P = PXcam[:,:,0]
     elif(depth[1,0]>0 and depth[1,1]>0):
@@ -106,7 +111,26 @@ def getCorrectProjectionMatrix(PXcam, K, p0, p1):
         P = PXcam[:,:,3]
         
     return P
+
+def plotPointCloud(pointCloud):
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111,projection='3d')
+
+    x = []
+    y = []
+    z = []
+
+    for i in range(pointCloud.shape[1]):
+        x.append(pointCloud[0]/pointCloud[3])
+        y.append(pointCloud[1]/pointCloud[3])
+        z.append(pointCloud[2]/pointCloud[3])
+
+    x = np.array(x)
+    y = np.array(y)
+    z = np.array(z)
     
+    ax1.scatter(x,y,z, depthshade=False)
+    plt.show()
 #filters out track noise, not complete yet
 def filterTracks(p0, p1):
     dist = []

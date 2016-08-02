@@ -26,7 +26,7 @@ class KLTtracker():
                 self.actPtLife[i] += 1
             else:
                 self.actPtLife[i] = 0
-    def track(self, frame): #tracks similar points between 2 frames
+    def track(self, frame, mapping=False, map2D3D=None, map3D2D=None): #tracks similar points between 2 frames
         if(len(self.p0)==0):
             return
         frame_gray = cvtools.GrayBlur(frame)
@@ -35,6 +35,9 @@ class KLTtracker():
     
         p0 = self.p0.copy()
 
+        if(mapping):
+            self.mapTrack(st,p0,p1,map2D3D,map3D2D)
+        
         #gets points with status of 1
         temp = []
         for i in range(len(st)):
@@ -140,4 +143,19 @@ class KLTtracker():
         self.oldFrame = frame_gray
 
         return p0, p1
+    
+    def mapTrack(self, st, p0, p1, map2D3D, map3D2D):
+        for i in range(len(map3D2D)):
+            map3D2D[i] = -1
+            
+        temp = []
+        
+        for i in range(len(st)):
+            if(st[i,0]==1):
+                temp.append(map2D3D[i])
+                map3D2D[map2D3D[i]] = len(temp)-1
 
+        map2D3D[:] = temp
+    def mapMatch(self, st, p0, p1, kp1, map2D3D, map3D2D):
+        
+        

@@ -52,7 +52,7 @@ close all;
 clear all;
 clc; 
 addpath(genpath('./')); % Current folder containing this code and other necessay scripts
-addpath(genpath('C:\Users\Dylan Thomas\Documents\MATLAB\KELLY_SLAM_CV_thesis_code_neat')); % Folder with the videos in it - CHANGE THIS TO YOUR DATA DIRECTORY
+addpath(genpath('C:\Users\dylan93\Documents\GitHub\Quad_CV-SLAM\Videos')); % Folder with the videos in it - CHANGE THIS TO YOUR DATA DIRECTORY
 
 %% Open video to read
 
@@ -67,8 +67,8 @@ addpath(genpath('C:\Users\Dylan Thomas\Documents\MATLAB\KELLY_SLAM_CV_thesis_cod
 
 
 % CLAM Synthetic and Real Data - vary the number to change the sequence
-vid = VideoReader('data051.avi'); cropVid = 0; cal='est'; initPixDist = 2; subRegionCount = 5; countThreshold = 9; %Synthetic scenes numbered 050 - 058
-% vid = VideoReader('data060.avi'); cropVid = 0; cal='est'; subRegionCount = 5; countThreshold = 19; %Synthetic scenes numbered 059 - 068
+% vid = VideoReader('HubbleTx.wmv'); cropVid = 0; cal='est'; initPixDist = 2; subRegionCount = 5; countThreshold = 9; %Synthetic scenes numbered 050 - 058
+vid = VideoReader('data060.avi'); cropVid = 0; cal='est'; subRegionCount = 5; countThreshold = 19; %Synthetic scenes numbered 059 - 068
 % vid = VideoReader('statue.mov'); cropVid = 0; cal='clam'; countThreshold = 9; subRegionCount = 5; %Other filenames: saltines.mov statue.mov volleyvall.mov hat.mov book.mov
 
 % Orbital Express Data
@@ -102,13 +102,13 @@ bestSubRegionKeep = 100; % Limit to the number of points re-detected throughout 
 totalTrackPointLimit = 1000; % Initial point detection limit
 
 % Default adjustable parameters. Only assigned if not assigned specifically for a particular video sequence:
-if ~exist('hammDistThresh'), hammDistThresh = .5; end
-if ~exist('initPixDist'), initPixDist = 1; end
-if ~exist('countThreshold'), countThreshold = 9; end
-if ~exist('subRegionCount'), subRegionCount = 3; end
-if ~exist('distMult'), distMult = 2; end
-if ~exist('maxBdErr'), maxBdErr = .05; end
-if ~exist('reprojectionErrorThresh'), reprojectionErrorThresh = 4; end
+if ~exist('hammDistThresh','var'), hammDistThresh = .5; end
+if ~exist('initPixDist','var'), initPixDist = 1; end
+if ~exist('countThreshold','var'), countThreshold = 9; end
+if ~exist('subRegionCount','var'), subRegionCount = 3; end
+if ~exist('distMult','var'), distMult = 2; end
+if ~exist('maxBdErr','var'), maxBdErr = .05; end
+if ~exist('reprojectionErrorThresh','var'), reprojectionErrorThresh = 4; end
 
 % Only recalculate the motion bbox every motionRate number of iterations
 motionRate = 10; motionCtr = 0;
@@ -116,8 +116,8 @@ motionRate = 10; motionCtr = 0;
 
 %% Open video writer object
 clear featureUpdateRate;
-if ~exist('startFrame'), startFrame = 1; end
-if ~exist('endFrame'), endFrame =  numFrames; end
+if ~exist('startFrame','var'), startFrame = 1; end
+if ~exist('endFrame','var'), endFrame =  numFrames; end
 plotAll = 0;
 stepSize = 1;
 plotSubRectangles = 0;
@@ -134,7 +134,7 @@ end
 motionFrame1 = rgb2gray(frames(:,:,:,startFrame));
 motionFrame2 = rgb2gray(frames(:,:,:,startFrame+20));
 [ convexHull, boundingBox, roiConvexHull  ] = motionHull( motionFrame1, motionFrame2, 25, plotAll  );
-if exist('manualBoundingBox')
+if exist('manualBoundingBox','var')
     boundingBox = manualBoundingBox;
 end
 
@@ -235,7 +235,7 @@ for i = startFrame+stepSize:stepSize:endFrame
     %% Update features for points with a life since update greater than featureUpdateRate # of frames
     
     currPtLife = pointLife(visiblePoints(:,1));
-    if exist('featureUpdateRate')
+    if exist('featureUpdateRate','var')
         updatePointsIndex = pointLifeSinceUpdate(visiblePoints(:,1)) > featureUpdateRate;
         if sum(updatePointsIndex) > 0 % If there are any points to be updated
             updateFeatures = extractBRIEFFeatures(currFrame,visiblePoints(updatePointsIndex,2:3)); % Extract new features for those points that have been around for a number of frames divisible by featureUpdateRate
@@ -250,7 +250,7 @@ for i = startFrame+stepSize:stepSize:endFrame
     motionCtr = motionCtr + 1;
     if motionCtr == motionRate
         [ convexHull, boundingBox, roiConvexHull ] = motionHull( prevFrame, currFrame, 10, 0  );
-        if exist('manualBoundingBox')
+        if exist('manualBoundingBox','var')
             boundingBox = manualBoundingBox;
         end
         prevFrame = currFrame;
@@ -387,7 +387,7 @@ for i = startFrame+stepSize:stepSize:endFrame
         
         % Solve PnP Problem to add next camera projection matrix P now that 2d - 3d matches are found
         [R, T, pnpIdxInliers] = cv.solvePnPRansac(pointCloud(2:4,pcIndex)',visiblePoints(has3dIndex,2:3),K1,[],'ReprojectionError',reprojectionErrorThresh,'IterationsCount',500);
-        if exist('pnpIdxInliers')
+        if exist('pnpIdxInliers','var')
             pnpIdxInliers = pnpIdxInliers + 1; % Since the OpenCV function begins indexing at zero
             % If it is an outlier, end that tracked point
             if size(pointCloud(2:4,pcIndex)',1) ~= size(pnpIdxInliers,1)
@@ -552,10 +552,11 @@ for i = startFrame+stepSize:stepSize:endFrame
     %% Display 3D scene from camera's perspective
     h2.XColor = 'white'; h2.YColor = 'white'; h2.ZColor = 'white';
     
-    if exist('pointCloud') % If there is a point cloud to draw
+    if exist('pointCloud','var') % If there is a point cloud to draw
         
         h3 = subplot_tight(2,2,4,0.01);
-        h3=showPointCloud(pointCloud(2,:),pointCloud(3,:),pointCloud(4,:),'MarkerSize',60);
+        % Changed from ShowPointCloud() to scatter3
+        h3=scatter3(pointCloud(2,:),pointCloud(3,:),pointCloud(4,:));
         colormap(winter);
         axis off;
         
@@ -591,11 +592,11 @@ for i = startFrame+stepSize:stepSize:endFrame
         camRtoWorld = camR';
         up = camRtoWorld(:,1)';
 
-        h3.CameraPosition = camCenter';
-        h3.CameraUpVector = up;
-
-        h3.CameraViewAngle = 25;
- 
+%         h3.CameraPosition = camCenter';
+%         h3.camup = up;
+% 
+%         h3.camva = 25;
+%  
         
     end
     

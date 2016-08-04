@@ -1,0 +1,6 @@
+*~
+*.pyc
+*.lib
+*.mexw64
+Kell_SLAM_Matlab/mexopencv-master/
+Kell_SLAM_Matlab/sba-1.6/

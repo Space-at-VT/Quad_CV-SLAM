@@ -10,8 +10,51 @@ Created on Thu Mar 24 18:06:54 2016
 import cv2
 import numpy as np
 import math
+import random
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+
+
+class Cluster():
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+        self.elements = []
+    def distFromPoint(self, x, y, z):
+        return math.sqrt((self.x-x)**2+(self.y-y)**2+(self.z-z)**2)
+    def addToCluster(self, point):
+        self.elements.append(point)
+
+def clusterPointCloud(pointCloud, k, numTrials = 100):
+    x = []
+    y = []
+    z = []
+
+    for i in range(pointCloud.shape[1]):
+        x.append(pointCloud[0][i]/pointCloud[3][i])
+        y.append(pointCloud[1][i]/pointCloud[3][i])
+        z.append(pointCloud[2][i]/pointCloud[3][i])
+
+    clusters = []
+    print(x)
+    for i in range(k):
+        randX = random.uniform(min(x),max(x))
+        randY = random.uniform(min(y),max(y))
+        randZ = random.uniform(min(z),max(z))
+        
+        clusters.append(Cluster(randX,randY,randZ))
+
+    for a in range(numTrials):
+        for b in range(len(x)):
+            minDist = -1
+            for c in range(len(clusters)):
+                if(minDist==-1):
+                    minDist = clusters[i].distFromPoint(x[i],y[i],z[i])
+                elif(clusters[i].distFromPoint(x[i],y[i],z[i])<minDist):
+                    minDist = clusters[i].distFromPoint(x[i],y[i],z[i])
+
 def GrayBlur(frame,k1=5,k2=5,sig=0):
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     frame = cv2.GaussianBlur(frame,(k1,k2),sig)
@@ -69,10 +112,10 @@ def getCorrectProjectionMatrix(PXcam, K, p0, p1):
                        np.multiply(PXcam[2,:,i],p1_hat[0,0])-PXcam[0,:,i],
                        np.multiply(PXcam[2,:,i],p1_hat[1,0])-PXcam[1,:,i]])
 
-        #A1n = math.sqrt(sum(A[0,:].*A[0,:]))
-        #A2n = math.sqrt(sum(A[1,:].*A[1,:]))
-        #A3n = math.sqrt(sum(A[0,:].*A[0,:]))
-        #A4n = math.sqrt(sum(A[0,:].*A[0,:]))
+##        A1n = math.sqrt(np.inner(A[0,:],A[0,:]))
+##        A2n = math.sqrt(np.inner(A[1,:],A[1,:]))
+##        A3n = math.sqrt(np.inner(A[0,:],A[0,:]))
+##        A4n = math.sqrt(np.inner(A[0,:],A[0,:]))
 
         A1n = np.sqrt(np.inner(A[0,:],A[0,:]))
         A2n = np.sqrt(np.inner(A[1,:],A[1,:]))
@@ -121,9 +164,9 @@ def plotPointCloud(pointCloud):
     z = []
 
     for i in range(pointCloud.shape[1]):
-        x.append(pointCloud[0]/pointCloud[3])
-        y.append(pointCloud[1]/pointCloud[3])
-        z.append(pointCloud[2]/pointCloud[3])
+        x.append(pointCloud[0][i]/pointCloud[3][i])
+        y.append(pointCloud[1][i]/pointCloud[3][i])
+        z.append(pointCloud[2][i]/pointCloud[3][i])
 
     x = np.array(x)
     y = np.array(y)

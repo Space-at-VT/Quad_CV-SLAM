@@ -35,8 +35,8 @@ class KLTtracker():
     
         p0 = self.p0.copy()
 
-        if(mapping):
-            self.mapTrack(st,p0,p1,map2D3D,map3D2D)
+        #if(mapping):
+            #self.mapTrack(st,p0,p1,map2D3D,map3D2D)
         
         #gets points with status of 1
         temp = []
@@ -86,10 +86,6 @@ class KLTtracker():
         for ii in range(0,kp1.size):
             kp1[ii].pt = (kp1[ii].pt[0]+self.x,kp1[ii].pt[1]+self.y)
         
-        self.p0 = np.zeros([kp1.size,2],dtype = np.float32)
-        for ii in range(0,kp1.size):
-            self.p0[ii,:] = (kp1[ii].pt[0],kp1[ii].pt[1])
-        
         p1, st, err = cv2.calcOpticalFlowPyrLK(self.oldFrame, frame_gray, self.p0, None, **self.lkParams)
         
         stIdx = np.zeros([kp1.size,1],dtype = np.int16)
@@ -130,15 +126,18 @@ class KLTtracker():
         for i in range(len(st)):
             if(st[i,0]==1):
                 temp.append(kp1[i])
-        self.kp0 = temp
+        self.kp0 = kp1
 
         temp = []
         for i in range(len(st)):
             if(st[i,0]==1):
                 temp.append(des1[i])
-        self.des0 = temp
-        
-        self.p0 = np.array(p1.copy())
+        self.des0 = des1
+
+        self.p0 = np.zeros([kp1.size,2],dtype = np.float32)
+        for ii in range(0,kp1.size):
+            self.p0[ii,:] = (kp1[ii].pt[0],kp1[ii].pt[1])
+        #self.p0 = np.array(p1.copy())
 
         self.oldFrame = frame_gray
 
@@ -156,6 +155,5 @@ class KLTtracker():
                 map3D2D[map2D3D[i]] = len(temp)-1
 
         map2D3D[:] = temp
-    def mapMatch(self, st, p0, p1, kp1, map2D3D, map3D2D):
         
         
